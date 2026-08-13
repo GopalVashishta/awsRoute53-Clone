@@ -19,27 +19,31 @@ export default function CreateHostedZone() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!authLoading && !user) router.push('/login');
+    if(!authLoading && !user) 
+      router.push('/login');
   }, [user, authLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    try {
+    try{
       await apiRequest('/api/hosted-zones', {
         method: 'POST',
-        body: JSON.stringify({ name, comment, private_zone: privateZone })
+        body: JSON.stringify({ name, comment, is_private_zone: privateZone })
       });
       addNotification('success', `Successfully created hosted zone ${name}`);
       router.push('/hosted-zones');
-    } catch (err: any) {
+    }
+    catch(err: any) {
       addNotification('error', err.message || 'Failed to create hosted zone');
-    } finally {
+    }
+    finally{
       setSubmitting(false);
     }
   };
 
-  if (authLoading || !user) return <div style={{padding:40}}><Spinner /></div>;
+  if(authLoading || !user) 
+    return <div style={{padding:40}}><Spinner /></div>;
 
   return (
     <AppShell>

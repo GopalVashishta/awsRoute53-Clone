@@ -9,7 +9,7 @@ interface AuthCtx { user: User | null; loading: boolean; logout: () => Promise<v
 const AuthContext = createContext<AuthCtx>({ user: null, loading: true, logout: async () => {}, setUser: () => {} });
 export const useAuth = () => useContext(AuthContext);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ children }: { children: React.ReactNode }){
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();

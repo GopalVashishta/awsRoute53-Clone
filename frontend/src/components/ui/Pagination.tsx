@@ -7,7 +7,7 @@ interface Props {
 }
 
 export function Pagination({ page, totalPages, total, pageSize, onPage }: Props) {
-  if (total === 0) return null;
+  if(total === 0) return null;
   const start = Math.min((page - 1) * pageSize + 1, total);
   const end = Math.min(page * pageSize, total);
 

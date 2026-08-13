@@ -33,47 +33,52 @@ export default function ZoneDetails({ params }: { params: { zoneId: string } }) 
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    if (!authLoading && !user) router.push('/login');
+    if(!authLoading && !user) router.push('/login');
   }, [user, authLoading, router]);
 
   const loadData = async () => {
     setLoading(true);
-    try {
+    try{
       const zoneData = await apiRequest(`/api/hosted-zones/${zoneId}`);
       setZone(zoneData);
       
       const recordsData: any = await apiRequest(`/api/hosted-zones/${zoneId}/records?search=${search}&type=${typeFilter}&page=${page}&page_size=${pageSize}`);
       setRecords(recordsData.items || []);
       setTotal(recordsData.total || 0);
-    } catch (err: any) {
+    }
+    catch(err: any){
       addNotification('error', err.message || 'Failed to load data');
-    } finally {
+    }
+    finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (user) loadData();
+    if(user) loadData();
   }, [user, zoneId, search, typeFilter, page]);
 
   const handleDelete = async () => {
     setDeleting(true);
-    try {
-      for (const id of selected) {
+    try{
+      for(const id of selected){
         await apiRequest(`/api/hosted-zones/${zoneId}/records/${id}`, { method: 'DELETE' });
       }
       addNotification('success', `Deleted ${selected.length} record(s)`);
       setSelected([]);
       setDeleteModal(false);
       loadData();
-    } catch (err: any) {
+    }
+    catch(err: any){
       addNotification('error', err.message || 'Failed to delete records');
-    } finally {
+    }
+    finally{
       setDeleting(false);
     }
   };
 
-  if (authLoading || !user) return <div style={{padding:40}}><Spinner /></div>;
+  if(authLoading || !user) 
+    return <div style={{padding:40}}><Spinner /></div>;
 
   return (
     <AppShell>
@@ -133,7 +138,7 @@ export default function ZoneDetails({ params }: { params: { zoneId: string } }) 
                   {records.map(record => (
                     <tr key={record.id} className={selected.includes(record.id) ? 'selected' : ''}>
                       <td><input type="checkbox" checked={selected.includes(record.id)} onChange={e => {
-                        if (e.target.checked) setSelected([...selected, record.id]);
+                        if(e.target.checked) setSelected([...selected, record.id]);
                         else setSelected(selected.filter(id => id !== record.id));
                       }} /></td>
                       <td><Link href={`/hosted-zones/${zoneId}/records/${record.id}/edit`} style={{color:'#0972d3',textDecoration:'none'}}>{record.name}</Link></td>

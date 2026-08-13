@@ -3,7 +3,7 @@ import { useNotification } from '@/contexts/NotificationContext';
 
 export function FlashBar() {
   const { notifications, removeNotification } = useNotification();
-  if (!notifications.length) return null;
+  if(!notifications.length) return null;
   return (
     <div className="aws-flashbar">
       {notifications.map(n => (

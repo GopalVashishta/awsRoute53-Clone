@@ -23,14 +23,16 @@ export default function CreateRecord({ params }: { params: { zoneId: string } })
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!authLoading && !user) router.push('/login');
-    else if (user) apiRequest(`/api/hosted-zones/${zoneId}`).then(setZone).catch(() => {});
+    if(!authLoading && !user) 
+      router.push('/login');
+    else if(user) 
+      apiRequest(`/api/hosted-zones/${zoneId}`).then(setZone).catch(() => {});
   }, [user, authLoading, zoneId, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    try {
+    try{
       const fullDomain = name ? `${name}.${zone.name}` : zone.name;
       await apiRequest(`/api/hosted-zones/${zoneId}/records`, {
         method: 'POST',
@@ -38,14 +40,17 @@ export default function CreateRecord({ params }: { params: { zoneId: string } })
       });
       addNotification('success', `Successfully created record`);
       router.push(`/hosted-zones/${zoneId}`);
-    } catch (err: any) {
+    }
+    catch (err: any) {
       addNotification('error', err.message || 'Failed to create record');
-    } finally {
+    }
+    finally {
       setSubmitting(false);
     }
   };
 
-  if (authLoading || !user || !zone) return <div style={{padding:40}}><Spinner /></div>;
+  if(authLoading || !user || !zone) 
+    return <div style={{padding:40}}><Spinner /></div>;
 
   return (
     <AppShell>

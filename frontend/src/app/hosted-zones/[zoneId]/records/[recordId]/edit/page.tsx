@@ -24,12 +24,12 @@ export default function EditRecord({ params }: { params: { zoneId: string, recor
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!authLoading && !user) {
+    if(!authLoading && !user) {
       router.push('/login');
       return;
     }
     
-    if (user) {
+    if(user){
       Promise.all([
         apiRequest(`/api/hosted-zones/${zoneId}`),
         apiRequest(`/api/hosted-zones/${zoneId}/records/${recordId}`)
@@ -37,9 +37,10 @@ export default function EditRecord({ params }: { params: { zoneId: string, recor
       .then(([z, r]: [any, any]) => {
         setZone(z);
         let prefix = r.name;
-        if (prefix.endsWith(`.${z.name}`)) {
+        if(prefix.endsWith(`.${z.name}`)){
           prefix = prefix.slice(0, -(z.name.length + 1));
-        } else if (prefix === z.name) {
+        }
+        else if(prefix === z.name){
           prefix = '';
         }
         setName(prefix);
@@ -58,7 +59,7 @@ export default function EditRecord({ params }: { params: { zoneId: string, recor
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    try {
+    try{
       const fullDomain = name ? `${name}.${zone.name}` : zone.name;
       await apiRequest(`/api/hosted-zones/${zoneId}/records/${recordId}`, {
         method: 'PUT',
@@ -66,14 +67,17 @@ export default function EditRecord({ params }: { params: { zoneId: string, recor
       });
       addNotification('success', `Successfully updated record`);
       router.push(`/hosted-zones/${zoneId}`);
-    } catch (err: any) {
+    }
+    catch(err: any){
       addNotification('error', err.message || 'Failed to update record');
-    } finally {
+    }
+    finally{
       setSubmitting(false);
     }
   };
 
-  if (authLoading || !user || loading) return <div style={{padding:40}}><Spinner /></div>;
+  if(authLoading || !user || loading) 
+    return <div style={{padding:40}}><Spinner /></div>;
 
   return (
     <AppShell>

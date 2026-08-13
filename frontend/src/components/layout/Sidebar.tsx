@@ -36,6 +36,7 @@ export function Sidebar() {
               </Link>
             </li>
           );
+          
         })}
       </ul>
     </aside>

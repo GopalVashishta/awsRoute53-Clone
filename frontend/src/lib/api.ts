@@ -8,11 +8,11 @@ export async function apiRequest<T>(path: string, options?: RequestInit): Promis
     credentials: 'include',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
   });
-  if (!res.ok) {
+  if(!res.ok) {
     const data = await res.json().catch(() => ({}));
     const err = data.error || data.detail?.error || { code: 'UNKNOWN', message: res.statusText };
     throw { ...err, status: res.status } as ApiError;
   }
-  if (res.status === 204) return {} as T;
+  if(res.status === 204) return {} as T;
   return res.json();
 }
