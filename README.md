@@ -4,6 +4,8 @@ A full-stack, enterprise-grade clone of the **AWS Route53 console web applicatio
 
 This application replicates the authentic AWS Route53 console look-and-feel, top navigation bar with user account dropdown, sidebar navigation, table interactions, BIND zone import/export, dark mode, keyboard shortcuts, and full persistent CRUD workflows for Hosted Zones and DNS Records.
 
+# Demo Link (Railway): https://route53client-production.up.railway.app/
+Credentials to use: *Email*: `admin@example.com` *Password*: `admin123`
 ---
 
 ## 1. Setup Instructions & Deployment Guide
