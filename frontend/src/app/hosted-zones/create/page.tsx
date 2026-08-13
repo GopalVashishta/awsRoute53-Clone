@@ -43,7 +43,7 @@ export default function CreateHostedZone() {
   };
 
   if(authLoading || !user) 
-    return <div style={{padding:40}}><Spinner /></div>;
+    return <div style={{padding:40, textAlign: 'center'}}><Spinner /></div>;
 
   return (
     <AppShell>
@@ -51,35 +51,47 @@ export default function CreateHostedZone() {
         <div className="aws-breadcrumb">Route 53 &gt; Hosted zones &gt; Create hosted zone</div>
         
         <div style={{ marginTop: 20 }}>
-          <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 20 }}>Create hosted zone</h1>
+          <h1 className="aws-page-title">Create hosted zone</h1>
           
-          <form onSubmit={handleSubmit} style={{ background: 'white', padding: 20, border: '1px solid #eaeded', borderRadius: 2 }}>
+          <form onSubmit={handleSubmit} className="aws-form-card">
             <div className="aws-form-group">
               <label className="aws-label">Domain name</label>
-              <input type="text" value={name} onChange={e => setName(e.target.value)} className="aws-input" required />
-              <div className="aws-form-description">Example: example.com</div>
+              <input 
+                type="text" 
+                value={name} 
+                onChange={e => setName(e.target.value)} 
+                className="aws-input" 
+                placeholder="example.com"
+                required 
+              />
+              <div className="aws-form-description">The name of the domain you want to route traffic for.</div>
             </div>
             
             <div className="aws-form-group">
               <label className="aws-label">Description (optional)</label>
-              <textarea value={comment} onChange={e => setComment(e.target.value)} className="aws-textarea"></textarea>
+              <textarea 
+                value={comment} 
+                onChange={e => setComment(e.target.value)} 
+                className="aws-textarea"
+                placeholder="Description of this hosted zone"
+              ></textarea>
             </div>
             
             <div className="aws-form-group">
               <label className="aws-label">Type</label>
               <div>
-                <label style={{ display: 'block', marginBottom: 8 }}>
-                  <input type="radio" name="type" checked={!privateZone} onChange={() => setPrivateZone(false)} style={{ marginRight: 8 }} />
+                <label className="aws-radio-label">
+                  <input type="radio" name="type" checked={!privateZone} onChange={() => setPrivateZone(false)} />
                   Public hosted zone
                 </label>
-                <label style={{ display: 'block' }}>
-                  <input type="radio" name="type" checked={privateZone} onChange={() => setPrivateZone(true)} style={{ marginRight: 8 }} />
+                <label className="aws-radio-label">
+                  <input type="radio" name="type" checked={privateZone} onChange={() => setPrivateZone(true)} />
                   Private hosted zone
                 </label>
               </div>
             </div>
             
-            <div style={{ display: 'flex', gap: 8, marginTop: 24, paddingTop: 16, borderTop: '1px solid #eaeded' }}>
+            <div className="aws-form-footer">
               <Button type="button" onClick={() => router.push('/hosted-zones')}>Cancel</Button>
               <Button type="submit" variant="primary" loading={submitting}>Create hosted zone</Button>
             </div>

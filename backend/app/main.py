@@ -24,17 +24,32 @@ app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[origin for origin in (settings.CORS_ORIGINS if isinstance(settings.CORS_ORIGINS, list) else [settings.CORS_ORIGINS])],
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+from fastapi.exceptions import RequestValidationError
 
 @app.exception_handler(AppError)
 async def app_error_handler(request: Request, exc: AppError):
     return JSONResponse(
         status_code=exc.status_code,
         content={"error": {"code": exc.code, "message": exc.message}}
+    )
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    errors = exc.errors()
+    msg = errors[0].get("msg", "Invalid request data") if errors else "Invalid request data"
+    loc = errors[0].get("loc", ()) if errors else ()
+    code = "INVALID_RECORD_TYPE" if "type" in loc else "INVALID_INPUT"
+    if msg.startswith("Value error, "):
+        msg = msg[len("Value error, "):]
+    return JSONResponse(
+        status_code=400,
+        content={"error": {"code": code, "message": msg}}
     )
 
 app.include_router(auth.router)

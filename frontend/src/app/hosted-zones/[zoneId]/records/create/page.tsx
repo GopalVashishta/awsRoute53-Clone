@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppShell } from '@/components/layout/AppShell';
 import { Button } from '@/components/ui/Button';
@@ -9,11 +9,12 @@ import { useNotification } from '@/contexts/NotificationContext';
 import { apiRequest } from '@/lib/api';
 import { RECORD_TYPES, TTL_PRESETS } from '@/lib/constants';
 
-export default function CreateRecord({ params }: { params: { zoneId: string } }) {
+export default function CreateRecord({ params }: { params: Promise<{ zoneId: string }> | { zoneId: string } }) {
+  const resolvedParams = typeof (params as any)?.then === 'function' ? use(params as Promise<{ zoneId: string }>) : (params as { zoneId: string });
+  const { zoneId } = resolvedParams;
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const { addNotification } = useNotification();
-  const { zoneId } = params;
   
   const [zone, setZone] = useState<any>(null);
   const [name, setName] = useState('');
@@ -50,7 +51,7 @@ export default function CreateRecord({ params }: { params: { zoneId: string } })
   };
 
   if(authLoading || !user || !zone) 
-    return <div style={{padding:40}}><Spinner /></div>;
+    return <div style={{padding:40, textAlign: 'center'}}><Spinner /></div>;
 
   return (
     <AppShell>
@@ -58,14 +59,21 @@ export default function CreateRecord({ params }: { params: { zoneId: string } })
         <div className="aws-breadcrumb">Route 53 &gt; Hosted zones &gt; {zone.name} &gt; Create record</div>
         
         <div style={{ marginTop: 20 }}>
-          <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 20 }}>Create record</h1>
+          <h1 className="aws-page-title">Create record</h1>
           
-          <form onSubmit={handleSubmit} style={{ background: 'white', padding: 20, border: '1px solid #eaeded', borderRadius: 2 }}>
+          <form onSubmit={handleSubmit} className="aws-form-card">
             <div className="aws-form-group">
               <label className="aws-label">Record name</label>
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <input type="text" value={name} onChange={e => setName(e.target.value)} className="aws-input" style={{ width: 300 }} />
-                <span style={{ marginLeft: 8, color: '#5f6b7a' }}>.{zone.name}</span>
+                <input 
+                  type="text" 
+                  value={name} 
+                  onChange={e => setName(e.target.value)} 
+                  className="aws-input" 
+                  style={{ width: 300 }} 
+                  placeholder="www, mail, subdomain..."
+                />
+                <span className="aws-input-addon">.{zone.name}</span>
               </div>
             </div>
             
@@ -78,7 +86,15 @@ export default function CreateRecord({ params }: { params: { zoneId: string } })
             
             <div className="aws-form-group">
               <label className="aws-label">TTL (seconds)</label>
-              <input type="number" value={ttl} onChange={e => setTtl(Number(e.target.value))} className="aws-input" style={{ width: 300, marginBottom: 8 }} required min={1} />
+              <input 
+                type="number" 
+                value={ttl} 
+                onChange={e => setTtl(Number(e.target.value))} 
+                className="aws-input" 
+                style={{ width: 300, marginBottom: 8 }} 
+                required 
+                min={1} 
+              />
               <div style={{ display: 'flex', gap: 8 }}>
                 {TTL_PRESETS.map(preset => (
                   <Button key={preset.value} type="button" size="sm" onClick={() => setTtl(preset.value)}>{preset.label}</Button>
@@ -88,11 +104,17 @@ export default function CreateRecord({ params }: { params: { zoneId: string } })
 
             <div className="aws-form-group">
               <label className="aws-label">Value</label>
-              <textarea value={value} onChange={e => setValue(e.target.value)} className="aws-textarea" required></textarea>
+              <textarea 
+                value={value} 
+                onChange={e => setValue(e.target.value)} 
+                className="aws-textarea" 
+                placeholder="IP address or destination (e.g. 192.0.2.1)"
+                required
+              ></textarea>
               <div className="aws-form-description">Enter multiple values on separate lines.</div>
             </div>
             
-            <div style={{ display: 'flex', gap: 8, marginTop: 24, paddingTop: 16, borderTop: '1px solid #eaeded' }}>
+            <div className="aws-form-footer">
               <Button type="button" onClick={() => router.push(`/hosted-zones/${zoneId}`)}>Cancel</Button>
               <Button type="submit" variant="primary" loading={submitting}>Create record</Button>
             </div>

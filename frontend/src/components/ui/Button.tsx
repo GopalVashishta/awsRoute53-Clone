@@ -6,11 +6,11 @@ interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant; loading?: boolean; size?: 'sm' | 'md';
 }
 
-const variantStyles: Record<Variant,React.CSSProperties> = {
-  primary: {backgroundColor:'#0972d3',color:'white',border:'1px solid #0860b3'},
-  normal: {backgroundColor:'white',color:'#16191f',border:'1px solid #aab7b8'},
-  danger: {backgroundColor:'#d91515',color:'white',border:'1px solid #b20d0d'},
-  link: {backgroundColor:'transparent',color:'#0972d3',border:'none',padding:'0',textDecoration:'underline'},
+const variantStyles: Record<Variant, React.CSSProperties> = {
+  primary: { backgroundColor: 'var(--color-primary)', color: '#ffffff', border: '1px solid var(--color-primary-hover)' },
+  normal: { backgroundColor: 'var(--color-surface)', color: 'var(--color-text)', border: '1px solid var(--color-border)' },
+  danger: { backgroundColor: 'var(--color-danger)', color: '#ffffff', border: '1px solid var(--color-danger)' },
+  link: { backgroundColor: 'transparent', color: 'var(--color-primary)', border: 'none', padding: '0', textDecoration: 'underline' },
 };
 
 export function Button({ variant='normal', loading, size='md', children, style, disabled, ...props }: Props) {

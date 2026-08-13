@@ -11,3 +11,8 @@ tests
 .next/
 node_modules/
 package-lock.json
+
+#for deployment i used docker
+Dockerfile
+docker-compose.yml
+.dockerignore

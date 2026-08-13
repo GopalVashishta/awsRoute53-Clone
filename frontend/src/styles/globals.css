@@ -1,19 +1,34 @@
 :root {
   --color-bg: #f1f3f3;
   --color-header: #232f3e;
-  --color-sidebar: #232f3e;
-  --color-sidebar-hover: #37475a;
-  --color-sidebar-active: #0972d3;
   --color-primary: #0972d3;
   --color-primary-hover: #0860b3;
   --color-text: #16191f;
   --color-text-secondary: #5f6b7a;
   --color-border: #d5dbdb;
   --color-surface: #ffffff;
+  --color-hover: #f2f3f3;
+  --color-active-bg: #ebf5fb;
   --color-danger: #d91515;
   --color-success: #037f0c;
   --color-warning: #8a6d3b;
   --font-family: 'Amazon Ember', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+[data-theme="dark"] {
+  --color-bg: #0f1b2a;
+  --color-header: #16191f;
+  --color-primary: #51a2f6;
+  --color-primary-hover: #3182ce;
+  --color-text: #f0f4f8;
+  --color-text-secondary: #a0aec0;
+  --color-border: #2d3748;
+  --color-surface: #1a202c;
+  --color-hover: #2d3748;
+  --color-active-bg: #1e3a5f;
+  --color-danger: #e53e3e;
+  --color-success: #38a169;
+  --color-warning: #dd6b20;
 }
 
 * {
@@ -28,6 +43,7 @@ body {
   font-family: var(--font-family);
   font-size: 14px;
   line-height: 1.5;
+  transition: background-color 0.2s, color 0.2s;
 }
 
 a {

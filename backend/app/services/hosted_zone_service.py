@@ -100,3 +100,32 @@ def delete_zone(db: Session, user_id: str, zone_id: str):
     db.query(DnsRecord).filter(DnsRecord.hosted_zone_id == zone_id).delete()
     db.delete(zone)
     db.commit()
+
+def bulk_delete_zones(db: Session, user_id: str, zone_ids: list) -> dict:
+    deleted = 0
+    skipped = []
+    
+    for zone_id in zone_ids:
+        zone = db.query(HostedZone).filter(
+            HostedZone.id == zone_id,
+            HostedZone.user_id == user_id
+        ).first()
+        if not zone:
+            skipped.append({"id": zone_id, "reason": "Not found"})
+            continue
+        
+        non_default_records = db.query(DnsRecord).filter(
+            DnsRecord.hosted_zone_id == zone_id,
+            DnsRecord.type.notin_(["NS", "SOA"])
+        ).count()
+        
+        if non_default_records > 0:
+            skipped.append({"id": zone_id, "name": zone.name, "reason": f"Zone has {non_default_records} non-default record(s). Delete all records first."})
+            continue
+        
+        db.query(DnsRecord).filter(DnsRecord.hosted_zone_id == zone_id).delete()
+        db.delete(zone)
+        deleted += 1
+    
+    db.commit()
+    return {"deleted": deleted, "skipped": skipped, "message": f"Deleted {deleted} zone(s)"}
