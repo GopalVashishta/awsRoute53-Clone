@@ -8,7 +8,7 @@ This application replicates the authentic AWS Route53 console look-and-feel, top
 
 ## 1. Setup Instructions & Deployment Guide
 
-### Option A: Local Development Setup
+### Option A: Development Setup
 
 #### Prerequisites
 - **Python**: 3.12+
@@ -46,71 +46,45 @@ npm run dev
 
 ---
 
-### Option B: Docker Compose Deployment (Client + Server Together)
-
-Deploy the entire stack (FastAPI backend + Next.js frontend) in a single command using Docker Compose:
-
-#### Prerequisites
-- **Docker** & **Docker Compose** installed on your host/server.
-
-#### Single-Command Launch
-```bash
-# From project root directory
-docker-compose up --build -d
-```
-
-#### Docker Environment Setup
-- **Backend Container**: Listens on port `8000`. SQLite database persisted in named volume `backend_data`.
-- **Frontend Container**: Listens on port `3000`. Built using multi-stage Node 24 Alpine Dockerfile.
-- **Stopping Deployment**: `docker-compose down`
-
----
-
-### Option C: Standalone Docker Deployment (Docker Alone)
-
-If running containers individually without Docker Compose:
-
-```bash
-# 1. Build & run backend container
-cd backend
-docker build -t route53-backend .
-docker run -d -p 8000:8000 \
-  -e DATABASE_URL="sqlite:///./route53.db" \
-  -e SECRET_KEY="route53-production-secret-key-change-in-production" \
-  -e CORS_ORIGINS="http://localhost:3000,http://127.0.0.1:3000" \
-  -v backend_data:/app \
-  --name route53-backend route53-backend
-
-# 2. Build & run frontend container
-cd ../frontend
-docker build --build-arg NEXT_PUBLIC_API_URL="http://localhost:8000" -t route53-frontend .
-docker run -d -p 3000:3000 \
-  -e NEXT_PUBLIC_API_URL="http://localhost:8000" \
-  --name route53-frontend route53-frontend
-```
-
----
-
 ## 2. Architecture Overview
 
 ### 2.1 System Architecture & Docker Deployment Diagram
 
 ```
-┌────────────────────────────────────────────────────────────────────────┐
-│                        DOCKER COMPOSE CONTAINER                        │
-│                                                                        │
-│  ┌─────────────────────────────────┐   ┌────────────────────────────┐  │
-│  │   NEXT.JS FRONTEND (Port 3000)   │   │  FASTAPI BACKEND (Port 8000)│  │
-│  │                                 │   │                            │  │
-│  │  TopNav (AWS User Dropdown)     │   │  Layer 1: Middleware & CORS│  │
-│  │  Sidebar (AWS Route 53 Tree)    │   │  Layer 2: Router Controllers│  │
-│  │  Dark Mode & Keyboard Shortcuts │───►  Layer 3: BIND Parser/Service│  │
-│  │  BIND Import / Export UI        │   │  Layer 4: SQLite Database  │  │
-│  └─────────────────────────────────┘   └─────────────┬──────────────┘  │
-│                                                      │                 │
-│                                                      ▼                 │
-│                                            [Volume: backend_data]      │
-└────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│                        NEXT.JS FRONTEND                     │
+│                                                             │
+│  Pages → Hooks (state) → API Client (lib/api.ts) → fetch()  │
+└──────────────────────────────┬──────────────────────────────┘
+                               │ HTTP + Cookie
+                               ▼
+┌─────────────────────────────────────────────────────────────┐
+│                        FASTAPI BACKEND                      │
+│                                                             │
+│  Layer 1: MIDDLEWARE                                         │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │  CORS config → Error handler (AppError → JSON)         │  │
+│  └────────────────────────────────────────────────────────┘  │
+│                               │                              │
+│  Layer 2: ROUTE HANDLERS (api/*.py)                          │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │  Depends(get_current_user) → validates session cookie  │  │
+│  │  Depends(get_db) → injects DB session                  │  │
+│  │  Pydantic schema → validates request body              │  │
+│  └────────────────────────────────────────────────────────┘  │
+│                               │                              │
+│  Layer 3: SERVICES (services/*.py)                           │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │  Business logic: domain validation, auto NS/SOA,       │  │
+│  │  zone emptiness check, record uniqueness               │  │
+│  └────────────────────────────────────────────────────────┘  │
+│                               │                              │
+│  Layer 4: DATABASE ACCESS                                    │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │  SQLAlchemy ORM → SQLite (route53.db)                  │  │
+│  └────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ### 2.2 Top Navigation & User Account Menu
