@@ -1,0 +1,13 @@
+Round1/
+.env
+.env.*
+venv/
+ProblemStatement.txt
+
+__pycache__/
+.pytest_cache
+tests
+
+.next/
+node_modules/
+package-lock.json

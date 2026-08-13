@@ -1,0 +1,24 @@
+.appShell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.mainContainer {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  background-color: var(--color-bg);
+  padding: 24px;
+}
+
+.contentInner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
