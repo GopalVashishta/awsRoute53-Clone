@@ -17,6 +17,12 @@ Credentials to use: *Email*: `admin@example.com` *Password*: `admin123`
 - **Node.js**: 20+ & npm
 
 #### 1. Run Backend (FastAPI)
+step up .env for Backend(replace SECRET_KEY with ur key & CORS_ORIGINS key with frontend URL):
+```.env
+DATABASE_URL=sqlite:///./route53.db
+SECRET_KEY=route53-production-secret-key-change-in-production
+CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+```
 ```bash
 cd backend
 
@@ -35,6 +41,11 @@ python main.py
 
 #### 2. Run Frontend (Next.js)
 Open a separate terminal window:
+
+Setup .env for Frontend(replace this with hosted backend URL when deploying):
+```.env
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
 ```bash
 cd frontend
 
